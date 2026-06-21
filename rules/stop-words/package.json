@@ -1,0 +1,38 @@
+{
+  "name": "textlint-rule-stop-words",
+  "version": "5.2.0",
+  "description": "Textlint rule to find filler words, buzzwords, and clichés",
+  "keywords": [
+    "buzzword",
+    "cliche",
+    "filler",
+    "rule",
+    "stop",
+    "stop-words",
+    "textlint",
+    "textlintrule",
+    "words"
+  ],
+  "homepage": "https://github.com/sapegin/raccoon-textlint/tree/main/rules/stop-words",
+  "license": "MIT",
+  "author": {
+    "name": "Artem Sapegin",
+    "url": "https://sapegin.me"
+  },
+  "repository": "sapegin/raccoon-textlint",
+  "files": [
+    "*.js",
+    "dict.txt"
+  ],
+  "type": "module",
+  "exports": "./index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "textlint-rule-helper": "2.5.0"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
