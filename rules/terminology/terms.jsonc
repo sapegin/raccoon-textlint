@@ -371,5 +371,5 @@
   ["resourse(s)?", "resource$1"],
   ["algoritm(s)?", "algorithms$1"],
   ["adress(es)?", "address$1"],
-  ["addres(es)?", "address$1"],
+  ["addres(es)?", "address$1"]
 ]

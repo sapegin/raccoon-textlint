@@ -6,6 +6,7 @@ import {
   type TextlintRuleContext,
 } from '@textlint/types';
 import { RuleHelper } from 'textlint-rule-helper';
+import { stripJsonComments } from '../../shared/util/stripJsonComments.js';
 
 /**
  * A term pattern could be:
@@ -32,17 +33,6 @@ const DEFAULT_OPTIONS: Options = {
 
 const sentenceStartRegExp = /\w+[!.?]\)? $/;
 const punctuation = String.raw`[\.,;:!?'"’”)]`;
-
-// TODO: Find a way to share these functions. Esbundle?
-function stripJsonComments(json: string) {
-  return (
-    json
-      // Remove /* */ comments
-      .replaceAll(/\/\*[\s\S]*?\*\//g, '')
-      // Remove // comments (but not in URLs)
-      .replaceAll(/(?<!:)\/\/.*/g, '')
-  );
-}
 
 function upperFirst(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);

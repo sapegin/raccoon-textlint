@@ -5,6 +5,8 @@ import {
   type TextlintFixableRuleModule,
   type TextlintRuleContext,
 } from '@textlint/types';
+import { matchCase } from '../../shared/util/matchCase.js';
+import { stripJsonComments } from '../../shared/util/stripJsonComments.js';
 
 export interface Options {
   // List of additional words: filename, npm module or an array of words
@@ -28,28 +30,13 @@ const MARK_GROUPS = [
   'ÿy',
 ];
 
-function stripJsonComments(json: string) {
-  return (
-    json
-      // Remove /* */ comments
-      .replaceAll(/\/\*[\s\S]*?\*\//g, '')
-      // Remove // comments (but not in URLs)
-      .replaceAll(/(?<!:)\/\/.*/g, '')
-  );
-}
-
-function upperFirst(text: string) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-export function matchCase(clone: string, original: string) {
-  return upperFirst(original) === original ? upperFirst(clone) : clone;
-}
-
 /**
  * Load JSON file, strip comments.
+ *
+ * TODO: Shall we move this to utils?
  */
 function loadJson(modulePath: string) {
+  // TODO: Should this be just path.join(cwd, modulepath)?
   const require = createRequire(import.meta.url);
   const resolvedModule = require.resolve(modulePath);
   const json = fs.readFileSync(resolvedModule, 'utf8');

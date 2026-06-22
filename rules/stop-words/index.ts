@@ -6,6 +6,7 @@ import {
   type TextlintRuleContext,
 } from '@textlint/types';
 import { RuleHelper } from 'textlint-rule-helper';
+import { matchCase } from '../../shared/util/matchCase.js';
 
 type Rule = readonly string[];
 
@@ -28,12 +29,12 @@ function splitLines(text: string) {
   return text.split(/\r?\n/);
 }
 
-function upperFirst(text: string) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-export function matchCase(clone: string, original: string) {
-  return upperFirst(original) === original ? upperFirst(clone) : clone;
+/**
+ * Minimal RegExp escaping. RegExp.escape() escapes too many things, which makes
+ * it difficult to build custom RegExps afterwards.
+ */
+function escapeRegExp(string: string): string {
+  return string.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }
 
 function reporter(
@@ -128,7 +129,7 @@ export function filterDict(
 
 /** RegExp to match exact word */
 export function getRegExp(word: string) {
-  const wordPattern = RegExp.escape(word).replaceAll("'", "['’‘]");
+  const wordPattern = escapeRegExp(word).replaceAll("'", "['’‘]");
   const punctuations = [
     String.raw`\.`,
     ',',
