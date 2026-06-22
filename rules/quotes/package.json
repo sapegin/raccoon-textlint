@@ -26,7 +26,7 @@
   "type": "module",
   "exports": "./index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "node ../../esbuild.config.mjs"
   },
   "dependencies": {
     "textlint-rule-helper": "2.5.0"
