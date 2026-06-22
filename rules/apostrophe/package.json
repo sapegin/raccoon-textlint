@@ -1,19 +1,17 @@
 {
-  "name": "textlint-rule-stop-words",
-  "version": "5.2.0",
-  "description": "Textlint rule to find filler words, buzzwords, and clichés",
+  "name": "textlint-rule-apostrophe",
+  "version": "3.0.0",
+  "description": "Textlint rule to check correct apostrophe usage",
   "keywords": [
-    "buzzword",
-    "cliche",
-    "filler",
+    "apostrophe",
+    "misspelling",
+    "proofreading",
     "rule",
-    "stop",
-    "stop-words",
     "textlint",
     "textlintrule",
-    "words"
+    "typography"
   ],
-  "homepage": "https://github.com/sapegin/raccoon-textlint/tree/main/rules/stop-words",
+  "homepage": "https://github.com/sapegin/raccoon-textlint/tree/main/rules/apostrophe",
   "license": "MIT",
   "author": {
     "name": "Artem Sapegin",
@@ -21,8 +19,7 @@
   },
   "repository": "sapegin/raccoon-textlint",
   "files": [
-    "index.js",
-    "dict.txt"
+    "index.js"
   ],
   "type": "module",
   "exports": "./index.js",

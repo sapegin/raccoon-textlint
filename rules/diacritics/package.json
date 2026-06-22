@@ -1,19 +1,21 @@
 {
-  "name": "textlint-rule-stop-words",
-  "version": "5.2.0",
-  "description": "Textlint rule to find filler words, buzzwords, and clichés",
+  "name": "textlint-rule-diacritics",
+  "version": "2.1.4",
+  "description": "Textlint rule to check correct usage of diacritics",
   "keywords": [
-    "buzzword",
-    "cliche",
-    "filler",
+    "diacritic",
+    "diacritical",
+    "diacritics",
+    "mark",
+    "misspelling",
+    "point",
+    "proofreading",
     "rule",
-    "stop",
-    "stop-words",
+    "sign",
     "textlint",
-    "textlintrule",
-    "words"
+    "textlintrule"
   ],
-  "homepage": "https://github.com/sapegin/raccoon-textlint/tree/main/rules/stop-words",
+  "homepage": "https://github.com/sapegin/raccoon-textlint/tree/main/rules/diacritics",
   "license": "MIT",
   "author": {
     "name": "Artem Sapegin",
@@ -22,7 +24,7 @@
   "repository": "sapegin/raccoon-textlint",
   "files": [
     "index.js",
-    "dict.txt"
+    "words.jsonc"
   ],
   "type": "module",
   "exports": "./index.js",

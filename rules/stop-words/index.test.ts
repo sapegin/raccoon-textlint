@@ -149,198 +149,200 @@ describe(filterDict, () => {
   });
 });
 
-tester.run(
-  'textlint-rule-stop-words',
-  {
-    rules: [
-      {
-        ruleId: 'stop-words',
-        rule,
-        options: {
-          words: [['Asciidoctor', 'Asciidoctor']],
+test('stop-words', () => {
+  tester.run(
+    'stop-words',
+    {
+      rules: [
+        {
+          ruleId: 'stop-words',
+          rule,
+          options: {
+            words: [['Asciidoctor', 'Asciidoctor']],
+          },
         },
-      },
-    ],
-  },
-  {
+      ],
+    },
+    {
+      valid: [
+        {
+          text: 'Asciidoctor is great',
+        },
+      ],
+      invalid: [
+        {
+          // The capitalization is incorrect
+          text: 'AsciiDoctor is a fast text processor',
+          output: 'Asciidoctor is a fast text processor',
+          errors: [
+            {
+              message: 'Avoid using “AsciiDoctor”, use “Asciidoctor” instead',
+            },
+          ],
+        },
+      ],
+    }
+  );
+
+  tester.run('stop-words', rule, {
     valid: [
       {
-        text: 'Asciidoctor is great',
+        // Should skip code examples
+        text: 'Do not `utilize` this',
+      },
+      {
+        // Should skip URLs
+        text: 'My [code](http://example.com/utilize) is good',
+      },
+      // Should not warn when incorrect term is used as a part of another word
+      {
+        text: 'Bar utilizen foo',
+      },
+      {
+        text: 'Utilizen',
+      },
+      {
+        text: 'Bar uberutilize foo',
+      },
+      {
+        text: 'uberutilize',
+      },
+      // Should not warn when incorrect term is used as a part of a hyphenates word
+      {
+        text: 'Install utilize-some-plugin here',
+      },
+      {
+        text: 'utilize-some-plugin',
+      },
+      {
+        text: 'Install some-plugin-utilize here',
+      },
+      {
+        text: 'some-plugin-utilize',
+      },
+      {
+        // Should not warn about file names
+        text: 'utilize.md',
+      },
+      {
+        // Should not treat words as regexp
+        text: 'I have an idea',
       },
     ],
     invalid: [
       {
-        // The capitalization is incorrect
-        text: 'AsciiDoctor is a fast text processor',
-        output: 'Asciidoctor is a fast text processor',
+        // One word
+        text: 'You should hyperlocal Elm',
+        output: 'You should hyperlocal Elm',
         errors: [
           {
-            message: 'Avoid using “AsciiDoctor”, use “Asciidoctor” instead',
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // One word, after a comma
+        text: 'You should, hyperlocal Elm',
+        output: 'You should, hyperlocal Elm',
+        errors: [
+          {
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // One word, after a colon
+        text: 'You should: hyperlocal Elm',
+        output: 'You should: hyperlocal Elm',
+        errors: [
+          {
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // One word, after a semicolon
+        text: 'You should; hyperlocal Elm',
+        output: 'You should; hyperlocal Elm',
+        errors: [
+          {
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // One word, before comma
+        text: 'You should hyperlocal,',
+        output: 'You should hyperlocal,',
+        errors: [
+          {
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // One word, before point
+        text: 'You should hyperlocal.',
+        output: 'You should hyperlocal.',
+        errors: [
+          {
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // One word, before ellipsis
+        text: 'You should hyperlocal…',
+        output: 'You should hyperlocal…',
+        errors: [
+          {
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // One word + fix
+        text: 'You should utilize Elm',
+        output: 'You should use Elm',
+        errors: [
+          {
+            message: 'Avoid using “utilize”, use “use” instead',
+          },
+        ],
+      },
+      {
+        // Several words, keep suffix
+        text: 'You should utilize Elm and hyperlocal JavaScript',
+        output: 'You should use Elm and hyperlocal JavaScript',
+        errors: [
+          {
+            message: 'Avoid using “utilize”, use “use” instead',
+          },
+          {
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // Keep formatting
+        text: 'You should **hyperlocal** Elm',
+        output: 'You should **hyperlocal** Elm',
+        errors: [
+          {
+            message: 'Avoid using “hyperlocal”',
+          },
+        ],
+      },
+      {
+        // Keep capital first letter
+        text: 'Utilize Elm',
+        output: 'Use Elm',
+        errors: [
+          {
+            message: 'Avoid using “Utilize”, use “use” instead',
           },
         ],
       },
     ],
-  }
-);
-
-tester.run('textlint-rule-stop-words', rule, {
-  valid: [
-    {
-      // Should skip code examples
-      text: 'Do not `utilize` this',
-    },
-    {
-      // Should skip URLs
-      text: 'My [code](http://example.com/utilize) is good',
-    },
-    // Should not warn when incorrect term is used as a part of another word
-    {
-      text: 'Bar utilizen foo',
-    },
-    {
-      text: 'Utilizen',
-    },
-    {
-      text: 'Bar uberutilize foo',
-    },
-    {
-      text: 'uberutilize',
-    },
-    // Should not warn when incorrect term is used as a part of a hyphenates word
-    {
-      text: 'Install utilize-some-plugin here',
-    },
-    {
-      text: 'utilize-some-plugin',
-    },
-    {
-      text: 'Install some-plugin-utilize here',
-    },
-    {
-      text: 'some-plugin-utilize',
-    },
-    {
-      // Should not warn about file names
-      text: 'utilize.md',
-    },
-    {
-      // Should not treat words as regexp
-      text: 'I have an idea',
-    },
-  ],
-  invalid: [
-    {
-      // One word
-      text: 'You should hyperlocal Elm',
-      output: 'You should hyperlocal Elm',
-      errors: [
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // One word, after a comma
-      text: 'You should, hyperlocal Elm',
-      output: 'You should, hyperlocal Elm',
-      errors: [
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // One word, after a colon
-      text: 'You should: hyperlocal Elm',
-      output: 'You should: hyperlocal Elm',
-      errors: [
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // One word, after a semicolon
-      text: 'You should; hyperlocal Elm',
-      output: 'You should; hyperlocal Elm',
-      errors: [
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // One word, before comma
-      text: 'You should hyperlocal,',
-      output: 'You should hyperlocal,',
-      errors: [
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // One word, before point
-      text: 'You should hyperlocal.',
-      output: 'You should hyperlocal.',
-      errors: [
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // One word, before ellipsis
-      text: 'You should hyperlocal…',
-      output: 'You should hyperlocal…',
-      errors: [
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // One word + fix
-      text: 'You should utilize Elm',
-      output: 'You should use Elm',
-      errors: [
-        {
-          message: 'Avoid using “utilize”, use “use” instead',
-        },
-      ],
-    },
-    {
-      // Several words, keep suffix
-      text: 'You should utilize Elm and hyperlocal JavaScript',
-      output: 'You should use Elm and hyperlocal JavaScript',
-      errors: [
-        {
-          message: 'Avoid using “utilize”, use “use” instead',
-        },
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // Keep formatting
-      text: 'You should **hyperlocal** Elm',
-      output: 'You should **hyperlocal** Elm',
-      errors: [
-        {
-          message: 'Avoid using “hyperlocal”',
-        },
-      ],
-    },
-    {
-      // Keep capital first letter
-      text: 'Utilize Elm',
-      output: 'Use Elm',
-      errors: [
-        {
-          message: 'Avoid using “Utilize”, use “use” instead',
-        },
-      ],
-    },
-  ],
+  });
 });

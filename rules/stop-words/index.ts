@@ -32,7 +32,7 @@ function upperFirst(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function cloneCase(clone: string, original: string) {
+export function matchCase(clone: string, original: string) {
   return upperFirst(original) === original ? upperFirst(clone) : clone;
 }
 
@@ -73,7 +73,7 @@ function reporter(
             if (alternative !== matchedWord) {
               const replacement = matched.replace(
                 matchedWord,
-                cloneCase(alternative, matchedWord)
+                matchCase(alternative, matchedWord)
               );
               const fix = context.fixer.replaceTextRange(
                 [index, index + matched.length],

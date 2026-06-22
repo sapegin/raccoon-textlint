@@ -16,6 +16,8 @@ export default defineConfig({
           'warn',
           { allowedFunctionCalls: ['tester.run'] },
         ],
+        // `tester.run` isn't detected by vitest
+        'vitest/expect-expect': 'off',
       },
     },
   ],

@@ -1,25 +1,38 @@
-# Textlint rules
+# textlint-rule-quotes
 
-Monorepo of [Artem Sapegin](https://sapegin.me/)’s Textlint rules.
+[![textlint fixable rule](https://img.shields.io/badge/textlint-fixable-green.svg?style=social)](https://textlint.github.io/)
+
+[Textlint](https://github.com/textlint/textlint) rule to check and fix correct usage of quotes and replace straight quotes (`"`) with proper quotes (`“”`).
+
+![textlint-rule-quotes](images/screenshot.png)
 
 [![Washing your code. A book on clean code for frontend developers](https://sapegin.me/images/washing-code-github.jpg)](https://sapegin.me/book/)
 
-## Rules
+## Installation
 
-- [apostrophe](rules/textlint-rule-apostrophe): correct apostrophe usage
-- [diacritics](rules/textlint-rule-diacritics): words with diacritics
-- [stop-words](rules/textlint-rule-stop-words): filler words, buzzwords and clichés
-- [terminology](rules/textlint-rule-terminology): correct terms spelling
-- [title-case](rules/textlint-rule-title-case): fix titles to use AP/APA style
+First, install from npm:
+
+```shell
+npm install textlint-rule-quotes
+```
+
+Then enable the rule in your `.textlintrc`:
+
+```js
+{
+  "rules": {
+    "quotes": true
+  }
+}
+```
+
+Read more about [configuring textlint](https://github.com/textlint/textlint/blob/master/docs/configuring.md).
 
 ## Usage
 
-```sh
-npm install
-npm run build
+```shell
+textlint --fix --rule quotes Readme.md
 ```
-
-The built artefacts (`index.js`) live next to each rule’s source.
 
 ## Contributing
 

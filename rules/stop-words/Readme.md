@@ -1,6 +1,6 @@
 # textlint-rule-stop-words
 
-[![textlint fixable rule](https://img.shields.io/badge/textlint-fixable-green.svg?style=social)](https://textlint.github.io/) [![npm](https://img.shields.io/npm/v/textlint-rule-stop-words.svg)](https://www.npmjs.com/package/textlint-rule-stop-words) [![Node.js CI status](https://github.com/sapegin/textlint-rule-stop-words/workflows/Node.js%20CI/badge.svg)](https://github.com/sapegin/textlint-rule-stop-words/actions)
+[![textlint fixable rule](https://img.shields.io/badge/textlint-fixable-green.svg?style=social)](https://textlint.github.io/) [![npm](https://img.shields.io/npm/v/textlint-rule-stop-words.svg)](https://www.npmjs.com/package/textlint-rule-stop-words)
 
 [textlint](https://github.com/textlint/textlint) rule to find filler words, buzzwords, and clichés — [2000+ words and phrases](./dict.txt) in English.
 
@@ -167,20 +167,9 @@ Oh my javascript!
 - [buzzwords](https://github.com/wooorm/buzzwords/)
 - [retext-simplify](https://github.com/wooorm/retext-simplify/)
 
-## Other textlint rules
-
-- [textlint-rule-apostrophe](https://github.com/sapegin/textlint-rule-apostrophe) — correct apostrophe usage
-- [textlint-rule-diacritics](https://github.com/sapegin/textlint-rule-diacritics) — words with diacritics
-- [textlint-rule-terminology](https://github.com/sapegin/textlint-rule-terminology) — correct terms spelling
-- [textlint-rule-title-case](https://github.com/sapegin/textlint-rule-title-case) — fix titles to use AP/APA style
-
-## Change log
-
-The change log can be found on the [Releases page](https://github.com/sapegin/textlint-rule-stop-words/releases).
-
 ## Contributing
 
-Bug fixes are welcome, but not new features. Please take a moment to review the [contributing guidelines](Contributing.md).
+Bug fixes are welcome, but not new features.
 
 ## Sponsoring
 
@@ -190,6 +179,6 @@ This software has been developed with lots of coffee, buy me one more cup to kee
 
 ## Authors and license
 
-[Artem Sapegin](https://sapegin.me) and [contributors](https://github.com/sapegin/textlint-rule-stop-words/graphs/contributors).
+[Artem Sapegin](https://sapegin.me) and [contributors](https://github.com/sapegin/raccoon-textlint/graphs/contributors).
 
-MIT License, see the included [License.md](License.md) file. Also see the [project status](https://github.com/sapegin/textlint-rule-stop-words/discussions/45).
+MIT License, see the included [License.md](License.md) file.

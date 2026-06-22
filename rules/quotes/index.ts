@@ -1,0 +1,52 @@
+import { type TxtNode } from '@textlint/ast-node-types';
+import {
+  type TextlintFixableRuleModule,
+  type TextlintRuleContext,
+} from '@textlint/types';
+
+const evilQuotesRegExp = /("?\w+"|"\w+)/g;
+const goodQuoteOpen = '“';
+const goodQuoteClose = '”';
+
+export function getReplacement(text: string) {
+  return text.replace(/"(?=\w)/, goodQuoteOpen).replaceAll('"', goodQuoteClose);
+}
+
+function reporter(
+  // The Textlint context isn't deeply readonly and we only read from it
+  // oxlint-disable-next-line typescript/prefer-readonly-parameter-types
+  context: TextlintRuleContext
+) {
+  const { Syntax, RuleError } = context;
+  return {
+    [Syntax.Str](node: TxtNode) {
+      const text = context.getSource(node);
+
+      let match: RegExpExecArray | null;
+      while ((match = evilQuotesRegExp.exec(text))) {
+        const index = match.index;
+        const matched = match[0];
+        const replacement = getReplacement(matched);
+        const fix = context.fixer.replaceTextRange(
+          [index, index + matched.length],
+          replacement
+        );
+        const message = `Incorrect quote used: \`${matched}\`, use \`${replacement}\` instead`;
+        context.report(
+          node,
+          new RuleError(message, {
+            index,
+            fix,
+          })
+        );
+      }
+    },
+  };
+}
+
+const rule: TextlintFixableRuleModule = {
+  linter: reporter,
+  fixer: reporter,
+};
+
+export default rule;

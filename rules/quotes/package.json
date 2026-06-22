@@ -1,19 +1,19 @@
 {
-  "name": "textlint-rule-stop-words",
-  "version": "5.2.0",
-  "description": "Textlint rule to find filler words, buzzwords, and clichés",
+  "name": "textlint-rule-quotes",
+  "version": "1.0.0",
+  "description": "Textlint rule to check correct usage of quotes",
   "keywords": [
-    "buzzword",
-    "cliche",
-    "filler",
+    "dumb quotes",
+    "misspelling",
+    "proofreading",
+    "quotes",
     "rule",
-    "stop",
-    "stop-words",
+    "straight quotes",
     "textlint",
     "textlintrule",
-    "words"
+    "typography"
   ],
-  "homepage": "https://github.com/sapegin/raccoon-textlint/tree/main/rules/stop-words",
+  "homepage": "https://github.com/sapegin/raccoon-textlint/tree/main/rules/quotes",
   "license": "MIT",
   "author": {
     "name": "Artem Sapegin",
@@ -21,8 +21,7 @@
   },
   "repository": "sapegin/raccoon-textlint",
   "files": [
-    "index.js",
-    "dict.txt"
+    "index.js"
   ],
   "type": "module",
   "exports": "./index.js",

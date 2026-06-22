@@ -1,0 +1,223 @@
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import { type TxtNode, type TxtNodeType } from '@textlint/ast-node-types';
+import {
+  type TextlintFixableRuleModule,
+  type TextlintRuleContext,
+} from '@textlint/types';
+import { RuleHelper } from 'textlint-rule-helper';
+
+/**
+ * A term pattern could be:
+ * - string for exact match
+ * - tuple with a RegEx and replacement(s)
+ */
+type Tuple = readonly [string, string | readonly string[]];
+type Term = string | Tuple;
+
+export interface Options {
+  /** List of additional words: filename, npm module or an array of words. */
+  terms: string | readonly Term[];
+  skip: readonly TxtNodeType[];
+  defaultTerms: boolean;
+  exclude: readonly string[];
+}
+
+const DEFAULT_OPTIONS: Options = {
+  terms: [],
+  skip: ['BlockQuote'],
+  defaultTerms: true,
+  exclude: [],
+};
+
+const sentenceStartRegExp = /\w+[!.?]\)? $/;
+const punctuation = String.raw`[\.,;:!?'"’”)]`;
+
+// TODO: Find a way to share these functions. Esbundle?
+function stripJsonComments(json: string) {
+  return (
+    json
+      // Remove /* */ comments
+      .replaceAll(/\/\*[\s\S]*?\*\//g, '')
+      // Remove // comments (but not in URLs)
+      .replaceAll(/(?<!:)\/\/.*/g, '')
+  );
+}
+
+function upperFirst(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/**
+ * Match exact word in the middle of the text
+ */
+export function getExactMatchRegExp(pattern: string) {
+  // 1. Beginning of the string, or any character that isn't "-" or alphanumeric
+  // 2. Not a dot "." (to make it ignore file extensions)
+  // 3. Word boundary
+  // 4. Exact match of the pattern
+  // 5. Word boundary
+  // 6. Space, punctuation + space, punctuation + punctuation, or punctuation at
+  //    the end of the string, end of the string
+  return String.raw`(?<=^|[^-\w])(?<!\.)\b${pattern}\b(?= |${punctuation} |${punctuation}${punctuation}|${punctuation}$|$)`;
+}
+
+/**
+ * Match any of given words exactly in the middle of the text
+ */
+export function getMultipleWordRegExp(words: readonly string[]) {
+  return getExactMatchRegExp(`(?:${words.join('|')})`);
+}
+
+/**
+ * Match pattern on word boundaries in the middle of the text unless the pattern
+ * has lookbehinds or lookaheads
+ */
+export function getAdvancedRegExp(pattern: string) {
+  if (
+    // Look behind: (?<=...) and (?<!...)
+    pattern.startsWith('(?<') ||
+    // Positive look ahead: (?=...)
+    pattern.includes('(?=') ||
+    // Negative look ahead: (?!...)
+    pattern.includes('(?!')
+  ) {
+    return pattern;
+  }
+  return getExactMatchRegExp(pattern);
+}
+
+export function getReplacement(
+  pattern: string,
+  replacements: string | readonly string[],
+  matched: string
+) {
+  if (typeof replacements === 'string') {
+    const tag = 'xyz';
+    return `${tag} ${matched} ${tag}`
+      .replace(new RegExp(pattern, 'i'), replacements)
+      .slice(tag.length + 1, -(tag.length + 1));
+  }
+
+  return findWord(replacements, matched);
+}
+
+export function findWord(items: readonly string[], match: string) {
+  const lowerCaseMatch = match.toLowerCase();
+  return items.find((word) => word.toLowerCase() === lowerCaseMatch);
+}
+
+export function getTerms(
+  defaultTerms: boolean,
+  terms: string | readonly Term[],
+  exclude: readonly string[]
+) {
+  const defaults = defaultTerms ? loadJson('./terms.jsonc') : [];
+  const extras = typeof terms === 'string' ? loadJson(terms) : terms;
+  // Order matters, the first term to match is used. We prioritize user 'extras'
+  // before defaults
+  const listTerms = [...(Array.isArray(extras) ? extras : []), ...defaults];
+
+  // Filter on all terms
+  if (Array.isArray(exclude)) {
+    return listTerms.filter((term) => {
+      if (Array.isArray(term)) {
+        return exclude.includes(term[0]) === false;
+      }
+      return exclude.includes(term) === false;
+    });
+  }
+  return listTerms;
+}
+
+function loadJson(modulePath: string) {
+  const require = createRequire(import.meta.url);
+  const resolvedModule = require.resolve(modulePath);
+  const json = fs.readFileSync(resolvedModule, 'utf8');
+  return JSON.parse(stripJsonComments(json)) as Term[];
+}
+
+function reporter(
+  // The Textlint context isn't deeply readonly and we only read from it
+  // oxlint-disable-next-line typescript/prefer-readonly-parameter-types
+  context: TextlintRuleContext,
+  userOptions: Readonly<Partial<Options>> = {}
+) {
+  const options = { ...DEFAULT_OPTIONS, ...userOptions };
+  const terms = getTerms(options.defaultTerms, options.terms, options.exclude);
+
+  // Match all words (plain strings) with a single regexp
+  const words = terms.filter((rule) => typeof rule === 'string');
+  const exactWordRules: Tuple[] = [[getMultipleWordRegExp(words), words]];
+
+  // Create a separate regexp of each array rule ([pattern, replacement])
+  const advancedRules: Tuple[] = terms.filter(
+    (rule) => typeof rule !== 'string'
+  );
+
+  const rules = [...exactWordRules, ...advancedRules];
+
+  const helper = new RuleHelper(context);
+  const { Syntax, RuleError } = context;
+  return {
+    [Syntax.Str](node: TxtNode) {
+      if (
+        helper.isChildNode(
+          node,
+          options.skip.map((rule) => Syntax[rule])
+        )
+      ) {
+        return;
+      }
+
+      const text = context.getSource(node);
+
+      for (const [pattern, replacements] of rules) {
+        const regExp = new RegExp(
+          typeof pattern === 'string' ? getAdvancedRegExp(pattern) : pattern,
+          'igm'
+        );
+
+        let match;
+
+        while ((match = regExp.exec(text))) {
+          const index = match.index;
+          const matched = match[0];
+
+          let replacement = getReplacement(pattern, replacements, matched);
+          if (replacement === undefined) {
+            throw new Error('No replacement found');
+          }
+
+          // Capitalize word in the beginning of a sentence if the original
+          // word was capitalized
+          const textBeforeMatch = text.slice(0, Math.max(0, index));
+          const isSentenceStart =
+            index === 0 || sentenceStartRegExp.test(textBeforeMatch);
+          if (isSentenceStart && upperFirst(matched) === matched) {
+            replacement = upperFirst(replacement);
+          }
+
+          // Skip correct spelling
+          if (matched === replacement) {
+            continue;
+          }
+
+          const fix = context.fixer.replaceTextRange(
+            [index, index + matched.length],
+            replacement
+          );
+          const message = `Incorrect term: “${matched.trim()}”, use “${replacement.trim()}” instead`;
+          context.report(node, new RuleError(message, { index, fix }));
+        }
+      }
+    },
+  };
+}
+
+const rule: TextlintFixableRuleModule<Partial<Options>> = {
+  linter: reporter,
+  fixer: reporter,
+};
+
+export default rule;
