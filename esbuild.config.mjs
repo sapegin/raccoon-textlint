@@ -5,7 +5,12 @@ const context = await esbuild.context({
   entryPoints: ['index.ts'],
   outfile: 'index.js',
   bundle: true,
-  external: builtinModules,
+  external: [
+    ...builtinModules,
+    '@textlint/ast-node-types',
+    '@textlint/types',
+    'textlint-rule-helper',
+  ],
   platform: 'node',
   format: 'esm',
   target: 'esnext',

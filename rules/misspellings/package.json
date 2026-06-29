@@ -1,0 +1,35 @@
+{
+  "name": "textlint-rule-misspellings",
+  "version": "1.0.0",
+  "description": "Textlint rule to check common misspellings",
+  "keywords": [
+    "misspelling",
+    "misspellings",
+    "proofreading",
+    "rule",
+    "textlint",
+    "textlintrule"
+  ],
+  "homepage": "https://github.com/sapegin/raccoon-textlint/tree/main/rules/misspellings",
+  "license": "MIT",
+  "author": {
+    "name": "Artem Sapegin",
+    "url": "https://sapegin.me"
+  },
+  "repository": "sapegin/raccoon-textlint",
+  "files": [
+    "index.js",
+    "dict.jsonc"
+  ],
+  "type": "module",
+  "exports": "./index.js",
+  "scripts": {
+    "build": "node ../../esbuild.config.mjs"
+  },
+  "dependencies": {
+    "textlint-rule-helper": "2.5.0"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

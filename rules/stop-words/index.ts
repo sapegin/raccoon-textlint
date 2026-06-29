@@ -6,6 +6,7 @@ import {
   type TextlintRuleContext,
 } from '@textlint/types';
 import { RuleHelper } from 'textlint-rule-helper';
+import { getApostropheRegExpPattern } from '../../shared/util/getApostropheRegExpPattern.js';
 import { matchCase } from '../../shared/util/matchCase.js';
 
 type Rule = readonly string[];
@@ -27,14 +28,6 @@ const DEFAULT_OPTIONS: Options = {
 
 function splitLines(text: string) {
   return text.split(/\r?\n/);
-}
-
-/**
- * Minimal RegExp escaping. RegExp.escape() escapes too many things, which makes
- * it difficult to build custom RegExps afterwards.
- */
-function escapeRegExp(string: string): string {
-  return string.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }
 
 function reporter(
@@ -129,7 +122,7 @@ export function filterDict(
 
 /** RegExp to match exact word */
 export function getRegExp(word: string) {
-  const wordPattern = escapeRegExp(word).replaceAll("'", "['’‘]");
+  const wordPattern = getApostropheRegExpPattern(word);
   const punctuations = [
     String.raw`\.`,
     ',',
